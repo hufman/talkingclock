@@ -27,6 +27,18 @@ var Clock = {
         var differences = [];
         var count = 7;
 
+        // read old cookie
+        try {
+            var cookies = document.cookie.split(';');
+            for (var ci = 0; ci < cookies.length; ci++) {
+                var cookie = cookies[ci].split('=');
+                if (cookie[0].trim() == 'clock_offset')
+                    Clock.serverDifference = parseFloat(cookie[1]);
+            }
+        } catch (e) {
+            // ignore parse errors
+        }
+
         var run = function() {
             // set up the ajax call
             var request = null;
@@ -75,8 +87,9 @@ var Clock = {
                             Clock.loadingProgress('Syncing',1, 1);
                         Clock.synced = true;
 
-                        // Schedule for 10 minutes
-                        setTimeout(Clock.sync, 10*60*1000);
+                        // save the offset for future page loads
+                        var days = 7;
+                        document.cookie = 'clock_offset='+Clock.serverDifference+"; expires="+new Date(new Date().getTime() + days * 24 * 60 * 60 * 1000).toGMTString() + '; path=/';
                     }
                 }
             };
@@ -88,6 +101,9 @@ var Clock = {
         } catch (e) {
             // Problem while running AJAX call
         }
+
+        // Schedule for 10 minutes
+        setTimeout(Clock.sync, 10*60*1000);
     },
     /** Get the current correct time */
     "getTime": function() {
