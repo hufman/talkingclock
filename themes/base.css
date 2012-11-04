@@ -1,0 +1,18 @@
+span {padding-right:1em; margin:0}
+
+.timezone {display:none}
+.short {display:none}
+.zero {display:inline}
+.trim {display:none}
+.weekday.numeric {display:none}
+.month.numeric {display:none}
+.day.zero {display:none}
+.day.trim {display:inline}
+.date.slash {display:none}
+.hr24 {display:none}
+
+.time {padding-right: 2px}
+.time.second {padding-right: 1em}
+.date {padding-right: 2px}
+.date.day {padding-right: 1em}
+.date.year {padding-right: 1em}
