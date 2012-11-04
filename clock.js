@@ -42,6 +42,9 @@ var Clock = {
     "voice":null,
     "loadedCount":0,
     "soundsCount":0,
+    "alreadyPlayed":false,
+
+    /** Preload the sounds */
     "loadSounds":function () {
         var loadSound = function(filename) {
             var sound = new Audio();
@@ -61,11 +64,14 @@ var Clock = {
         this.sounds['tone'] = loadSound('sounds/tone.wav');
         Clock.soundsCount = sounds.length + 1;
     },
+    /** Play a certain sound */
     "playSound":function (sound) {
         this.sounds[sound].play();
     },
-    "playSequence":function (sequence) {
-        var offset = 0;
+    /** Schedule a sequence to play */
+    "scheduleSequence":function (startDate, sequence) {
+        var curDate = new Date();
+        var offset = startDate.getTime() - curDate.getTime();
         for (var i = 0; i < sequence.length; i++) {
             var curSound = sequence[i]+"";
             var scheduledFunction = function(sound) {
@@ -73,31 +79,39 @@ var Clock = {
                     Clock.playSound(sound);
                 };
             }(curSound);
-            setTimeout(scheduledFunction, offset);
+            if (offset>0)
+                setTimeout(scheduledFunction, offset);
             offset += this.voice.getSoundLength(curSound);
         }
+        Clock.alreadyPlayed = true;
     },
+    /** Generate and schedule the next phrase */
     "scheduleNextPhrase":function () {
         var curDate = new Date();
-        var nextDate = this.voice.getNextPromptTime(curDate);
-        var phrase = this.voice.getTimePhrase(nextDate);
-        var phraselength = this.voice.getPhraseLength(phrase);
+        var nextDate = curDate;
+        do {
+            var nextDate = this.voice.getNextPromptTime(nextDate);
+            var phrase = this.voice.getTimePhrase(nextDate);
+            var phraselength = this.voice.getPhraseLength(phrase);
 
-        curDate = new Date();
-        var fullDelay = nextDate.getTime() - curDate.getTime();
-        var startDelay = fullDelay - phraselength - 1000;
+            curDate = new Date();
+            var fullDelay = nextDate.getTime() - curDate.getTime();
+        } while (Clock.alreadyPlayed && fullDelay - phraselength - 1000 < 0)
+
 
         if (this.loadedCount == this.soundsCount) {     // if all the sounds are loaded
-            setTimeout(function () {
-                Clock.playSequence(phrase);
-            }, startDelay);
+            this.scheduleSequence(new Date(nextDate.getTime() - phraselength - 1000), phrase);
             setTimeout(function () {
                 Clock.playSound("tone")
             }, fullDelay);
+            setTimeout(function() {
+                Clock.scheduleNextPhrase()
+            }, fullDelay);
+        } else {
+            setTimeout(function() {
+                Clock.scheduleNextPhrase()
+            }, 50);
         }
-        setTimeout(function() {
-            Clock.scheduleNextPhrase()
-        }, fullDelay);
     }
 };
 
@@ -149,11 +163,13 @@ var PatFleet = {
         "seconds":888,
         "at-tone-time-exactly":2680
     },
+    /** Get the list of sounds */
     "getSounds": function() {
         return Object.keys(this.durations);
     },
+    /** Get the next time that we could say */
     "getNextPromptTime": function(date) {
-        var myDate = new Date(date.getTime() + 8000);
+        var myDate = new Date(date.getTime() + 1000);
         var seconds = myDate.getSeconds();
         var newseconds = 0;
         var roundups = [10, 15, 20, 30, 40, 45, 50, 60];        // what seconds we'll actually speak
@@ -164,6 +180,7 @@ var PatFleet = {
         var mytimestamp = myDate.getTime() + (newseconds - seconds)*1000;
         return new Date(mytimestamp);
     },
+    /** Generate a phrase to say a specific number */
     "getNumberPhrase": function(number) {
         var phrase = [];
         var tens = Math.floor((number % 100) / 10);
@@ -178,6 +195,7 @@ var PatFleet = {
             phrase = [String(tens*10), String(ones)];
         return phrase;
     },
+    /** Generate the phrase to say this specific time */
     "getTimePhrase": function(date) {
         var hours = date.getHours();
         var minutes = date.getMinutes();
@@ -207,11 +225,13 @@ var PatFleet = {
         return ['at-tone-time-exactly'].concat(phrase);
 
     },
+    /** Return the length (in milliseconds) for this sound */
     "getSoundLength": function(sound) {
         if (this.durations[sound])
             return this.durations[sound];
         return -1;
     },
+    /** Return the length (in milliseconds) for this phrase */
     "getPhraseLength": function(phrase) {
         var time = 0;
         for (var i=0; i<phrase.length; i++) {
