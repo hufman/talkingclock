@@ -18,7 +18,6 @@ var Clock = {
     "init": function() {
         Clock.voice = PatFleet;
         Clock.loadSounds();
-        Clock.sync();
         Clock.tick();
         Clock.scheduleNextPhrase();
     },
@@ -413,6 +412,16 @@ var PatFleet = {
     }
 };
 
+// Based on http://dustindiaz.com/smallest-domready-ever
+function onDomReady(f){document['addEventListener'] ? document.addEventListener('DOMContentLoaded',f) : /in/.test(document.readyState)?setTimeout(function(){onDomReady(f)},9):f()}
+
+// Hide Javascript warning if Javascript works
+onDomReady(function() {
+    document.getElementById('clock').style.visibility = "visible";
+    document.getElementById('needjs').style.visibility = "hidden";
+});
+
+// Start up the main clock
 if (window.addEventListener) {
     window.addEventListener('load', Clock.init, false);
 } else if (window.attachEvent) {

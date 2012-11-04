@@ -1,5 +1,6 @@
 span {padding-right:1em; margin:0}
 
+#clock {visibility: hidden}
 .timezone {display:none}
 .short {display:none}
 .zero {display:inline}
