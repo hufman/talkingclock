@@ -1,4 +1,6 @@
 <?php
+header("Cache-Control: no-cache, must-revalidate");
+header("Expires: Sat, 3 Nov 2010 00:00:00 GMT");
 $now = microtime(true);
 $ms = $now - floor($now);
 $ms = floor($ms * 1000000);
