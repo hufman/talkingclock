@@ -40,15 +40,17 @@ var Clock = {
                 Clock.synced = true;
             };
 
+            // Calculate the server difference
             var startTime = new Date();
             request.onreadystatechange = function() {
                 if (request.readyState === 4 && request.status === 200) {
                     var endTime = new Date();           // the current time
                     var reference = (endTime.getTime() - startTime.getTime())/2 + startTime.getTime();    // our local timestamp when the server's time was generated
                     var server = new Date(request.responseText);           // the server time
+                    if (server.toString() == 'Invalid Date')
+                        return;
                     var difference = server.getTime() - reference;
                     differences.push(difference);
-                    console.log("Got difference "+difference+" with server time "+server+' .'+server.getMilliseconds());
                     if (differences.length < count) {
                         Clock.loadingProgress('Syncing',differences.length, count);
                         run();
@@ -105,7 +107,18 @@ var Clock = {
     "loadSounds":function () {
         var loadSound = function(filename) {
             var sound = new Audio();
-            sound.src = filename;
+            var extensions = ['ogg', 'mp3', 'wav'];
+            var mimes = {"ogg":"audio/ogg", "mp3":"audio/mpeg", "wav":"audio/wav"};
+            for (var i=0; i<extensions.length; i++) {
+                var extension = extensions[i];
+                var mime = mimes[extension];
+                var src = document.createElement('source');
+                src.src = filename + '.' + extension;
+                src.type = mime;
+                sound.appendChild(src);
+            }
+            sound.preload = 'auto';
+            sound.setAttribute('preload', 'auto');
             sound.load();
             sound.addEventListener('canplay', function() {
                 Clock.loadedCount += 1;
@@ -113,13 +126,14 @@ var Clock = {
             });
             return sound;
         };
+
         var sounds = this.voice.getSounds();
+        Clock.soundsCount = sounds.length + 1;
         for (var i = 0; i < sounds.length; i++) {
             var name = sounds[i];
-            this.sounds[name] = loadSound(this.voice.directory + name + '.wav');
+            this.sounds[name] = loadSound(this.voice.directory + name);
         }
-        this.sounds['tone'] = loadSound('sounds/tone.wav');
-        Clock.soundsCount = sounds.length + 1;
+        this.sounds['tone'] = loadSound('sounds/tone');
         Clock.loadingProgress('Loaded',0, Clock.soundsCount);
     },
     /** Play a certain sound */
@@ -208,12 +222,6 @@ var PatFleet = {
         "50_":605,
         "60":809,
         "60_":756,
-        "70":818,
-        "70_":807,
-        "80":560,
-        "80_":551,
-        "90":720,
-        "90_":667,
         "and":598,
         "am":749,
         "pm":678,
