@@ -38,7 +38,7 @@ var Clock = {
             }
             if (request == null) {
                 Clock.synced = true;
-            };
+            }
 
             // Calculate the server difference
             var startTime = new Date();
@@ -46,9 +46,15 @@ var Clock = {
                 if (request.readyState === 4 && request.status === 200) {
                     var endTime = new Date();           // the current time
                     var reference = (endTime.getTime() - startTime.getTime())/2 + startTime.getTime();    // our local timestamp when the server's time was generated
-                    var server = new Date(request.responseText);           // the server time
-                    if (server.toString() == 'Invalid Date')
-                        return;
+                    var response = request.responseText;
+                    var server = new Date(response);           // the server timei
+                    if (server.toString() == 'Invalid Date') {
+                        response = response.replace(/\..*\+/,"+");
+                        server = new Date(response);
+                        if (server.toString() == 'Invalid Date') {
+                            return;
+                        }
+                    }
                     var difference = server.getTime() - reference;
                     differences.push(difference);
                     if (differences.length < count) {
@@ -69,7 +75,7 @@ var Clock = {
             };
             request.open('GET', 'current_time', true);
             request.send();
-        }
+        };
         run();
     },
     /** Get the current correct time */
