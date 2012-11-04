@@ -325,7 +325,7 @@ var PatFleet = {
         myDate.setMilliseconds(0);
         var seconds = myDate.getSeconds();
         var newseconds = 0;
-        var roundups = [10, 15, 20, 30, 40, 45, 50, 60];        // what seconds we'll actually speak
+        var roundups = [10, 20, 30, 40, 50, 60];        // what seconds we'll actually speak
         for (var i = roundups.length - 1; i >= 0; i--) {
             if (seconds<roundups[i])
                 newseconds = roundups[i];
