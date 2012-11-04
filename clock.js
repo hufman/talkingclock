@@ -7,16 +7,78 @@
  */
 
 var Clock = {
+    "sounds":{},
+    "voice":null,
+    "loadedCount":0,
+    "soundsCount":0,
+    "alreadyPlayed":false,
+    "synced":false,
+    "serverDifference":0,       // number of milliseconds to add to the local time to be real
+
     /** Start the clock going */
     "init": function() {
         this.voice = PatFleet;
         this.loadSounds();
+        this.sync();
         this.tick();
         this.scheduleNextPhrase();
     },
+    /** Sync from the server */
+    "sync": function() {
+        var differences = [];
+        var count = 7;
+
+        var run = function() {
+            // set up the ajax call
+            var request = null;
+            if (window.XMLHttpRequest) {
+                request = new XMLHttpRequest();
+            } else if (window.ActiveXObject) {
+                request = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            if (request == null) {
+                Clock.synced = true;
+            };
+
+            var startTime = new Date();
+            request.onreadystatechange = function() {
+                if (request.readyState === 4 && request.status === 200) {
+                    var endTime = new Date();           // the current time
+                    var reference = (endTime.getTime() - startTime.getTime())/2 + startTime.getTime();    // our local timestamp when the server's time was generated
+                    var server = new Date(request.responseText);           // the server time
+                    var difference = server.getTime() - reference;
+                    differences.push(difference);
+                    console.log("Got difference "+difference+" with server time "+server+' .'+server.getMilliseconds());
+                    if (differences.length < count) {
+                        Clock.loadingProgress('Syncing',differences.length, count);
+                        run();
+                    } else {
+                        var sum = 0;
+                        var counted = 0;
+                        for (var i=2; i<differences.length; i++) {
+                            sum += differences[i];
+                            counted += 1;
+                        }
+                        Clock.serverDifference = sum / counted;
+                        Clock.synced = true;
+                        Clock.loadingProgress('Syncing',1, 1);
+                    }
+                }
+            };
+            request.open('GET', 'current_time', true);
+            request.send();
+        }
+        run();
+    },
+    /** Get the current correct time */
+    "getTime": function() {
+        var date = new Date();
+        date = new Date(date.getTime() + Clock.serverDifference);
+        return date;
+    },
     /** Update the text clock and schedule the next tick */
     "tick":function() {
-        var date = new Date();
+        var date = Clock.getTime();
         var ms = date.getTime();
         var difference = 1000 - ms % 1000;
         setTimeout(Clock.tick, difference);
@@ -25,9 +87,9 @@ var Clock = {
         display.innerHTML = date.toString();
     },
     /** Change the progress indicator */
-    "loadingProgress":function(current, max) {
+    "loadingProgress":function(action, current, max) {
         var percent = current / max;
-        var output = "Loaded "+Math.floor(percent * 100) + '%';
+        var output = action+' '+Math.floor(percent * 100) + '%';
 
         var display = document.getElementById('progress');
         display.innerHTML = output;
@@ -38,11 +100,6 @@ var Clock = {
             }, 333);
         }
     },
-    "sounds":{},
-    "voice":null,
-    "loadedCount":0,
-    "soundsCount":0,
-    "alreadyPlayed":false,
 
     /** Preload the sounds */
     "loadSounds":function () {
@@ -52,7 +109,7 @@ var Clock = {
             sound.load();
             sound.addEventListener('canplay', function() {
                 Clock.loadedCount += 1;
-                Clock.loadingProgress(Clock.loadedCount, Clock.soundsCount);
+                Clock.loadingProgress('Loaded',Clock.loadedCount, Clock.soundsCount);
             });
             return sound;
         };
@@ -63,6 +120,7 @@ var Clock = {
         }
         this.sounds['tone'] = loadSound('sounds/tone.wav');
         Clock.soundsCount = sounds.length + 1;
+        Clock.loadingProgress('Loaded',0, Clock.soundsCount);
     },
     /** Play a certain sound */
     "playSound":function (sound) {
@@ -70,7 +128,7 @@ var Clock = {
     },
     /** Schedule a sequence to play */
     "scheduleSequence":function (startDate, sequence) {
-        var curDate = new Date();
+        var curDate = Clock.getTime();
         var offset = startDate.getTime() - curDate.getTime();
         for (var i = 0; i < sequence.length; i++) {
             var curSound = sequence[i]+"";
@@ -87,20 +145,20 @@ var Clock = {
     },
     /** Generate and schedule the next phrase */
     "scheduleNextPhrase":function () {
-        var curDate = new Date();
+        var curDate = Clock.getTime();
         var nextDate = curDate;
         do {
             nextDate = this.voice.getNextPromptTime(nextDate);
             var phrase = this.voice.getTimePhrase(nextDate);
             var phraselength = this.voice.getPhraseLength(phrase);
 
-            curDate = new Date();
+            curDate = Clock.getTime();
             var fullDelay = nextDate.getTime() - curDate.getTime();
         } while (Clock.alreadyPlayed && fullDelay - phraselength - 1000 < 0);
 
         if (this.loadedCount == this.soundsCount) {     // if all the sounds are loaded
             this.scheduleSequence(new Date(nextDate.getTime() - phraselength - 1000), phrase);
-            curDate = new Date();
+            curDate = Clock.getTime();
             fullDelay = nextDate.getTime() - curDate.getTime();
             setTimeout(function () {
                 Clock.playSound("tone")

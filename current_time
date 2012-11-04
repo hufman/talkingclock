@@ -1,0 +1,6 @@
+<?php
+$now = microtime(true);
+$ms = $now - floor($now);
+$ms = floor($ms * 1000000);
+echo date('Y-m-d\TH:i:s.'.$ms.'P', $now);
+?>

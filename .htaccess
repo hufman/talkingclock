@@ -1,0 +1,3 @@
+<Files "current_time">
+    SetHandler application/x-httpd-php
+</Files>
