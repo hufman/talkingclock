@@ -58,19 +58,26 @@ var Clock = {
                     }
                     var difference = server.getTime() - reference;
                     differences.push(difference);
+                    // Either schedule the next run
                     if (differences.length < count) {
-                        Clock.loadingProgress('Syncing',differences.length, count);
+                        if (! Clock.synced)
+                            Clock.loadingProgress('Syncing',differences.length, count);
                         run();
+                    // Or average the differences
                     } else {
                         var sum = 0;
                         var counted = 0;
-                        for (var i=2; i<differences.length; i++) {
+                        for (var i=2; i<differences.length; i++) {      // Skip the first two as outliers
                             sum += differences[i];
                             counted += 1;
                         }
                         Clock.serverDifference = sum / counted;
+                        if (! Clock.synced)
+                            Clock.loadingProgress('Syncing',1, 1);
                         Clock.synced = true;
-                        Clock.loadingProgress('Syncing',1, 1);
+
+                        // Schedule for 10 minutes
+                        setTimeout(Clock.sync, 10*60*1000);
                     }
                 }
             };
