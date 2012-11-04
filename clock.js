@@ -3,7 +3,6 @@
  * User: hufman
  * Date: 11/3/12
  * Time: 2:53 PM
- * To change this template use File | Settings | File Templates.
  */
 
 var Clock = {
@@ -17,11 +16,11 @@ var Clock = {
 
     /** Start the clock going */
     "init": function() {
-        this.voice = PatFleet;
-        this.loadSounds();
-        this.sync();
-        this.tick();
-        this.scheduleNextPhrase();
+        Clock.voice = PatFleet;
+        Clock.loadSounds();
+        Clock.sync();
+        Clock.tick();
+        Clock.scheduleNextPhrase();
     },
     /** Sync from the server */
     "sync": function() {
@@ -84,7 +83,11 @@ var Clock = {
             request.open('GET', 'current_time', true);
             request.send();
         };
-        run();
+        try {
+            run();
+        } catch (e) {
+            // Problem while running AJAX call
+        }
     },
     /** Get the current correct time */
     "getTime": function() {
@@ -394,6 +397,8 @@ var PatFleet = {
     }
 };
 
-window.onload = function() {
-    Clock.init();
-};
+if (window.addEventListener) {
+    window.addEventListener('load', Clock.init, false);
+} else if (window.attachEvent) {
+    window.attachEvent('onload', Clock.init);
+}
