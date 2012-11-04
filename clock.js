@@ -245,6 +245,8 @@ var Clock = {
     },
     /** Play a certain sound */
     "playSound":function (sound) {
+        this.sounds[sound].pause();
+        this.sounds[sound].currentTime = 0;
         this.sounds[sound].play();
     },
     /** Schedule a sequence to play */
