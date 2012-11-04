@@ -197,8 +197,10 @@ var Clock = {
             sound.setAttribute('preload', 'auto');
             sound.load();
             sound.addEventListener('canplay', function() {
-                Clock.loadedCount += 1;
-                Clock.loadingProgress('Loaded',Clock.loadedCount, Clock.soundsCount);
+                if (Clock.loadedCount < Clock.soundsCount) {
+                    Clock.loadedCount += 1;
+                    Clock.loadingProgress('Loaded',Clock.loadedCount, Clock.soundsCount);
+                }
             });
             return sound;
         };
