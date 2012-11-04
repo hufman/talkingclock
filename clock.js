@@ -63,6 +63,7 @@ var Clock = {
                         response = response.replace(/\..*\+/,"+");
                         server = new Date(response);
                         if (server.toString() == 'Invalid Date') {
+                            Clock.loadingProgress('Syncing',1, 1);
                             Clock.synced = true;
                             return;
                         }
