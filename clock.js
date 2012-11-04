@@ -90,17 +90,18 @@ var Clock = {
         var curDate = new Date();
         var nextDate = curDate;
         do {
-            var nextDate = this.voice.getNextPromptTime(nextDate);
+            nextDate = this.voice.getNextPromptTime(nextDate);
             var phrase = this.voice.getTimePhrase(nextDate);
             var phraselength = this.voice.getPhraseLength(phrase);
 
             curDate = new Date();
             var fullDelay = nextDate.getTime() - curDate.getTime();
-        } while (Clock.alreadyPlayed && fullDelay - phraselength - 1000 < 0)
-
+        } while (Clock.alreadyPlayed && fullDelay - phraselength - 1000 < 0);
 
         if (this.loadedCount == this.soundsCount) {     // if all the sounds are loaded
             this.scheduleSequence(new Date(nextDate.getTime() - phraselength - 1000), phrase);
+            curDate = new Date();
+            fullDelay = nextDate.getTime() - curDate.getTime();
             setTimeout(function () {
                 Clock.playSound("tone")
             }, fullDelay);
@@ -170,6 +171,7 @@ var PatFleet = {
     /** Get the next time that we could say */
     "getNextPromptTime": function(date) {
         var myDate = new Date(date.getTime() + 1000);
+        myDate.setMilliseconds(0);
         var seconds = myDate.getSeconds();
         var newseconds = 0;
         var roundups = [10, 15, 20, 30, 40, 45, 50, 60];        // what seconds we'll actually speak
