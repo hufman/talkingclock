@@ -381,7 +381,7 @@ var PatFleet = {
             phrase = [hours > 0 ? String(hours % 12) : String(12), 'oclock', hours > 11 ? 'pm': 'am'];
         }
         else {
-            var hoursphrase = [hours > 0 ? String(hours % 12) : String(12)];
+            var hoursphrase = [(hours % 12) > 0 ? String(hours % 12) : String(12)];
 
             var minutesphrase = [];
             if (minutes<10)
