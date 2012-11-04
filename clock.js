@@ -159,8 +159,8 @@ var Clock = {
         document.getElementById('numericday').innerHTML = date.getDate();
         document.getElementById('zeronumericday').innerHTML = zeropad(2,date.getDate());
         document.getElementById('year').innerHTML = date.getFullYear();
-        document.getElementById('hour12').innerHTML = date.getHours() % 12;
-        document.getElementById('zerohour12').innerHTML = zeropad(2,date.getHours() % 12);
+        document.getElementById('hour12').innerHTML = date.getHours() % 12 == 0 ? 12 : date.getHours() % 12;
+        document.getElementById('zerohour12').innerHTML = zeropad(2,date.getHours() % 12 == 0 ? 12 : date.getHours() % 12);
         document.getElementById('hour24').innerHTML = date.getHours();
         document.getElementById('zerohour24').innerHTML = zeropad(2,date.getHours());
         document.getElementById('minute').innerHTML = date.getMinutes();
