@@ -18,6 +18,7 @@ var Clock = {
     "init": function() {
         Clock.voice = PatFleet;
         Clock.loadSounds();
+        Clock.sync();
         Clock.tick();
         Clock.scheduleNextPhrase();
     },
