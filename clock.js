@@ -60,8 +60,10 @@ var Clock = {
                     var response = request.responseText;
                     var server = new Date(response);           // the server time
                     if (server.toString() == 'Invalid Date') {
+                        var subseconds = /\.[^+]*/.exec(response);
                         response = response.replace(/\..*\+/,"+");
                         server = new Date(response);
+                        server.setMilliseconds(parseFloat(subseconds) * 1000);
                         if (server.toString() == 'Invalid Date') {
                             Clock.loadingProgress('Syncing',1, 1);
                             Clock.synced = true;
