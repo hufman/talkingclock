@@ -8,6 +8,7 @@
 var Clock = {
     "sounds":{},
     "voice":null,
+    "view":null,
     "loadedCount":0,
     "soundsCount":0,
     "alreadyPlayed":false,
@@ -16,9 +17,11 @@ var Clock = {
 
     /** Start the clock going */
     "init": function() {
-        Clock.voice = PatFleet;
+        Clock.voice = Clock.voice ? Clock.voice : PatFleet;
+        Clock.view = Clock.view ? Clock.view : HTMLDigitalView;
         Clock.loadSounds();
         Clock.sync();
+        Clock.view.init();
         Clock.tick();
         Clock.scheduleNextPhrase();
     },
@@ -121,76 +124,7 @@ var Clock = {
         var difference = 1000 - ms % 1000;
         setTimeout(Clock.tick, difference);
 
-        var longweekdays = [
-            "Sunday",
-            "Monday",
-            "Tuesday",
-            "Wednesday",
-            "Thursday",
-            "Friday",
-            "Saturday"
-        ];
-        var shortweekdays = [
-            "Sun",
-            "Mon",
-            "Tue",
-            "Wed",
-            "Thu",
-            "Fri",
-            "Sat"
-        ];
-        var longmonths = [
-            "January",
-            "February",
-            "March",
-            "April",
-            "May",
-            "June",
-            "July",
-            "August",
-            "September",
-            "October",
-            "November",
-            "December"
-        ];
-        var shortmonths = [
-            "Jan",
-            "Feb",
-            "Mar",
-            "Apr",
-            "May",
-            "Jun",
-            "Jul",
-            "Aug",
-            "Sep",
-            "Oct",
-            "Nov",
-            "Dec"
-        ];
-
-        var zeropad = function(digits, value) {
-            return (new Array(digits + 1 - value.toString().length).join('0')) + value;
-        };
-        document.getElementById('shortweekday').innerHTML = shortweekdays[date.getDay()];
-        document.getElementById('longweekday').innerHTML = longweekdays[date.getDay()];
-        document.getElementById('numericweekday').innerHTML = date.getDay()+1;
-        document.getElementById('shortmonth').innerHTML = shortmonths[date.getMonth()];
-        document.getElementById('longmonth').innerHTML = longmonths[date.getMonth()];
-        document.getElementById('numericmonth').innerHTML = date.getMonth()+1;
-        document.getElementById('zeronumericmonth').innerHTML = zeropad(2,date.getMonth()+1);
-        document.getElementById('numericday').innerHTML = date.getDate();
-        document.getElementById('zeronumericday').innerHTML = zeropad(2,date.getDate());
-        document.getElementById('year').innerHTML = date.getFullYear();
-        document.getElementById('hour12').innerHTML = date.getHours() % 12 == 0 ? 12 : date.getHours() % 12;
-        document.getElementById('zerohour12').innerHTML = zeropad(2,date.getHours() % 12 == 0 ? 12 : date.getHours() % 12);
-        document.getElementById('hour24').innerHTML = date.getHours();
-        document.getElementById('zerohour24').innerHTML = zeropad(2,date.getHours());
-        document.getElementById('minute').innerHTML = date.getMinutes();
-        document.getElementById('zerominute').innerHTML = zeropad(2,date.getMinutes());
-        document.getElementById('second').innerHTML = date.getSeconds();
-        document.getElementById('zerosecond').innerHTML = zeropad(2,date.getSeconds());
-        document.getElementById('ampm').innerHTML = date.getHours() > 11 ? 'PM': 'AM';
-        document.getElementById('timezonenumeric').innerHTML = date.getTimezoneOffset() / 60;
+        Clock.view.update(date);
 
     },
     /** Change the progress indicator */
@@ -415,6 +349,83 @@ var PatFleet = {
             time += this.durations[phrase[i]];
         }
         return time;
+    }
+};
+
+/** The code that actual renders the clock */
+var HTMLDigitalView = {
+    "init": function() {},
+    "update": function(now) {
+        var longweekdays = [
+            "Sunday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday"
+        ];
+        var shortweekdays = [
+            "Sun",
+            "Mon",
+            "Tue",
+            "Wed",
+            "Thu",
+            "Fri",
+            "Sat"
+        ];
+        var longmonths = [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December"
+        ];
+        var shortmonths = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec"
+        ];
+
+        var zeropad = function(digits, value) {
+            return (new Array(digits + 1 - value.toString().length).join('0')) + value;
+        };
+        document.getElementById('shortweekday').innerHTML = shortweekdays[now.getDay()];
+        document.getElementById('longweekday').innerHTML = longweekdays[now.getDay()];
+        document.getElementById('numericweekday').innerHTML = now.getDay()+1;
+        document.getElementById('shortmonth').innerHTML = shortmonths[now.getMonth()];
+        document.getElementById('longmonth').innerHTML = longmonths[now.getMonth()];
+        document.getElementById('numericmonth').innerHTML = now.getMonth()+1;
+        document.getElementById('zeronumericmonth').innerHTML = zeropad(2,now.getMonth()+1);
+        document.getElementById('numericday').innerHTML = now.getDate();
+        document.getElementById('zeronumericday').innerHTML = zeropad(2,now.getDate());
+        document.getElementById('year').innerHTML = now.getFullYear();
+        document.getElementById('hour12').innerHTML = now.getHours() % 12 == 0 ? 12 : now.getHours() % 12;
+        document.getElementById('zerohour12').innerHTML = zeropad(2,now.getHours() % 12 == 0 ? 12 : now.getHours() % 12);
+        document.getElementById('hour24').innerHTML = now.getHours();
+        document.getElementById('zerohour24').innerHTML = zeropad(2,now.getHours());
+        document.getElementById('minute').innerHTML = now.getMinutes();
+        document.getElementById('zerominute').innerHTML = zeropad(2,now.getMinutes());
+        document.getElementById('second').innerHTML = now.getSeconds();
+        document.getElementById('zerosecond').innerHTML = zeropad(2,now.getSeconds());
+        document.getElementById('ampm').innerHTML = now.getHours() > 11 ? 'PM': 'AM';
+        document.getElementById('timezonenumeric').innerHTML = now.getTimezoneOffset() / 60;
     }
 };
 
