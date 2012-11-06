@@ -1,6 +1,13 @@
-span {padding-right:1em; margin:0}
-
+#description {max-width: 70%}
+#github {
+    text-indent: -99999px;
+    height: 50px;
+    width: 50px;
+    white-space: nowrap;
+}
 #clock {visibility: hidden}
+
+span {padding-right:1em; margin:0}
 .timezone {display:none}
 .short {display:none}
 .zero {display:inline}

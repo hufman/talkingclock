@@ -1,4 +1,11 @@
 #clock {visibility: hidden}
+#description {max-width: 70%}
+#github {
+    text-indent: -99999px;
+    height: 50px;
+    width: 50px;
+    white-space: nowrap;
+}
 
 /* Style based on http://www.rainmeterskin.com/rainmeter/2012/0329/209.html */
 body {
