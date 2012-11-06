@@ -1,0 +1,83 @@
+#clock {visibility: hidden}
+
+/* Style based on http://www.rainmeterskin.com/rainmeter/2012/0329/209.html */
+body {
+    background-color: #9E9E9E;
+    background-image: linear-gradient(left, #9E9E9E 6%, #D4D4D4 93%);
+    background-image: -o-linear-gradient(left, #9E9E9E 6%, #D4D4D4 93%);
+    background-image: -moz-linear-gradient(left, #9E9E9E 6%, #D4D4D4 93%);
+    background-image: -webkit-linear-gradient(left, #9E9E9E 6%, #D4D4D4 93%);
+    background-image: -ms-linear-gradient(left, #9E9E9E 6%, #D4D4D4 93%);
+
+    background-image: -webkit-gradient(
+        linear,
+        left bottom,
+        left bottom,
+        color-stop(0.06, #9E9E9E),
+    color-stop(0.93, #D4D4D4)
+    );
+
+    font-family: "Bitstream Vera Sans", "Dejavu Sans", "Lucida Sans", sans-serif;
+}
+
+#clock {
+    position: relative;
+    height: 200pt;
+}
+
+#shortweekday {
+    display: none;
+}
+#longweekday {
+    color: #fafafa;
+    font-size: 40pt;
+    position: absolute;
+    top: 104pt;
+    left: 20pt;
+}
+#numericweekday {
+    display: none;
+}
+.month {
+    display: none;
+}
+.year {
+    display: none;
+}
+#numericday {
+    display: none;
+}
+#zeronumericday {
+    color: #86888d;
+    font-size: 140pt;
+    left: 28pt;
+    position: absolute;
+    z-index: -1;
+}
+.time.zero {
+    color: #34353a;
+}
+.time.trim {
+    display: none;
+}
+.hour.hr12 {
+    display: none;
+}
+
+#zerotime {
+    color: #34353a;
+    font-size: 70pt;
+    left: 7pt;
+    position: absolute;
+    top: 34pt;
+}
+#zerominutecolon, #zerosecond {
+    color: #fafafa;
+    font-size: 38pt;
+}
+.ampm {
+    display: none;
+}
+.timezone {
+    display: none;
+}
