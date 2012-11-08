@@ -481,12 +481,5 @@ function onDomReady(f){document['addEventListener'] ? document.addEventListener(
 onDomReady(function() {
     document.getElementById('clock').style.visibility = "visible";
     document.getElementById('needjs').style.visibility = "hidden";
-    HTMLDigitalView.init();
+    Clock.init();
 });
-
-// Start up the main clock
-if (window.addEventListener) {
-    window.addEventListener('load', Clock.init, false);
-} else if (window.attachEvent) {
-    window.attachEvent('onload', Clock.init);
-}
