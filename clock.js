@@ -5,6 +5,12 @@
  * Time: 2:53 PM
  */
 
+if(typeof String.prototype.trim !== 'function') {
+    String.prototype.trim = function() {
+        return this.replace(/^\s+|\s+$/g, '');
+    }
+}
+
 var Clock = {
     "sounds":{},
     "voice":null,
