@@ -17,12 +17,12 @@ var Clock = {
 
     /** Start the clock going */
     "init": function() {
-        Clock.voice = Clock.voice ? Clock.voice : PatFleet;
-        Clock.view = Clock.view ? Clock.view : HTMLDigitalView;
-        Clock.loadSounds();
+        Clock.voice = Clock.voice || PatFleet;
+        Clock.view = Clock.view || HTMLDigitalView;
         Clock.sync();
         Clock.view.init();
         Clock.tick();
+        Clock.loadSounds();
         Clock.scheduleNextPhrase();
     },
     /** Sync from the server */
@@ -61,7 +61,25 @@ var Clock = {
                     var endTime = new Date();           // the current time
                     var reference = (endTime.getTime() - startTime.getTime())/2 + startTime.getTime();    // our local timestamp when the server's time was generated
                     var response = request.responseText;
-                    var server = new Date(response);           // the server time
+
+                    var rfc = /([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]{2}):([0-9]{2}):([0-9]{2})(\.[0-9]*|)([+-][0-9]{2}):([0-9]{2})/;
+                    var formatted = rfc.exec(response);
+
+                    // this method creates a local time object, not a GMT object
+                    //var server = new Date(formatted[1], formatted[2]-1, formatted[3], formatted[4], formatted[5], formatted[6], formatted[7] ? parseFloat(formatted[7])*1000 : 0);           // the server time
+
+                    // this method will properly handle GMT time, which then gets offset by the server timezone
+                    var server = new Date();                            // the server time
+                    server.setUTCFullYear(parseInt(formatted[1],10));
+                    server.setUTCMonth(parseInt(formatted[2],10)-1);
+                    server.setUTCDate(parseInt(formatted[3],10));
+                    server.setUTCHours(parseInt(formatted[4],10));
+                    server.setUTCMinutes(parseInt(formatted[5],10));
+                    server.setUTCSeconds(parseInt(formatted[6],10));
+                    if (formatted[7]) server.setUTCMilliseconds(parseFloat(formatted[7])*1000,10);
+                    var offset = parseInt(formatted[8],10)*60 + parseInt(formatted[9],10) * (parseInt(formatted[8],10)<0?-1:1);
+                    server.setTime(server.getTime() - offset * 60 * 1000 );     // adjust to get the GMT time
+
                     if (server.toString() == 'Invalid Date') {
                         var subseconds = /\.[^+]*/.exec(response);
                         response = response.replace(/\..*\+/,"+");
@@ -168,20 +186,26 @@ var Clock = {
             return sound;
         };
 
-        var sounds = this.voice.getSounds();
-        Clock.soundsCount = sounds.length + 1;
-        for (var i = 0; i < sounds.length; i++) {
-            var name = sounds[i];
-            this.sounds[name] = loadSound(this.voice.directory + name);
+        try {
+            var sounds = this.voice.getSounds();
+            Clock.soundsCount = sounds.length + 1;
+            for (var i = 0; i < sounds.length; i++) {
+                var name = sounds[i];
+                this.sounds[name] = loadSound(this.voice.directory + name);
+            }
+            this.sounds['tone'] = loadSound('sounds/tone');
+            Clock.loadingProgress('Loaded',0, Clock.soundsCount);
+        } catch (e) {
+            // error while loading sound
         }
-        this.sounds['tone'] = loadSound('sounds/tone');
-        Clock.loadingProgress('Loaded',0, Clock.soundsCount);
     },
     /** Play a certain sound */
     "playSound":function (sound) {
-        this.sounds[sound].pause();
-        this.sounds[sound].currentTime = 0;
-        this.sounds[sound].play();
+        if (this.sounds[sound]) {
+            this.sounds[sound].pause();
+            this.sounds[sound].currentTime = 0;
+            this.sounds[sound].play();
+        }
     },
     /** Schedule a sequence to play */
     "scheduleSequence":function (startDate, sequence) {
