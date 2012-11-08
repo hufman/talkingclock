@@ -378,7 +378,28 @@ var PatFleet = {
 
 /** The code that actual renders the clock */
 var HTMLDigitalView = {
-    "init": function() {},
+    "init": function() {
+        document.getElementById('shortweekday').innerHTML = "";
+        document.getElementById('longweekday').innerHTML = "";
+        document.getElementById('numericweekday').innerHTML = "";
+        document.getElementById('shortmonth').innerHTML = "";
+        document.getElementById('longmonth').innerHTML = "";
+        document.getElementById('numericmonth').innerHTML = "0";
+        document.getElementById('zeronumericmonth').innerHTML = "00";
+        document.getElementById('numericday').innerHTML = "0";
+        document.getElementById('zeronumericday').innerHTML = "00";
+        document.getElementById('year').innerHTML = "0000";
+        document.getElementById('hour12').innerHTML = "00";
+        document.getElementById('zerohour12').innerHTML = "00";
+        document.getElementById('hour24').innerHTML = "00";
+        document.getElementById('zerohour24').innerHTML = "00";
+        document.getElementById('minute').innerHTML = "00";
+        document.getElementById('zerominute').innerHTML = "00";
+        document.getElementById('second').innerHTML = "00";
+        document.getElementById('zerosecond').innerHTML = "00";
+        document.getElementById('ampm').innerHTML = "";
+        document.getElementById('timezonenumeric').innerHTML = "00";
+    },
     "update": function(now) {
         var longweekdays = [
             "Sunday",
@@ -460,6 +481,7 @@ function onDomReady(f){document['addEventListener'] ? document.addEventListener(
 onDomReady(function() {
     document.getElementById('clock').style.visibility = "visible";
     document.getElementById('needjs').style.visibility = "hidden";
+    HTMLDigitalView.init();
 });
 
 // Start up the main clock
