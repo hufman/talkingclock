@@ -344,7 +344,7 @@ var PatFleet = {
 
         var phrase = [];
         if (minutes == 0 && seconds == 0) {
-            phrase = [hours > 0 ? String(hours % 12) : String(12), 'oclock', hours > 11 ? 'pm': 'am'];
+            phrase = [(hours % 12) > 0 ? String(hours % 12) : String(12), 'oclock', hours > 11 ? 'pm': 'am'];
         }
         else {
             var hoursphrase = [(hours % 12) > 0 ? String(hours % 12) : String(12)];
