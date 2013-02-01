@@ -29,7 +29,6 @@ var Clock = {
         Clock.view.init();
         Clock.tick();
         Clock.loadSounds();
-        Clock.scheduleNextPhrase();
     },
     /** Sync from the server */
     "sync": function() {
@@ -71,6 +70,15 @@ var Clock = {
                     var rfc = /([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]{2}):([0-9]{2}):([0-9]{2})(\.[0-9]*|)([+-][0-9]{2}):([0-9]{2})/;
                     var formatted = rfc.exec(response);
 
+                    // handle improper server responses
+                    if (formatted == null) {
+                        if (! Clock.synced)
+                            Clock.loadingProgress('Syncing',1, 1);
+                        Clock.synced = true;
+                        Clock.finishedLoadingStep();
+                        return;
+                    }
+
                     // this method creates a local time object, not a GMT object
                     //var server = new Date(formatted[1], formatted[2]-1, formatted[3], formatted[4], formatted[5], formatted[6], formatted[7] ? parseFloat(formatted[7])*1000 : 0);           // the server time
 
@@ -94,6 +102,7 @@ var Clock = {
                         if (server.toString() == 'Invalid Date') {
                             Clock.loadingProgress('Syncing',1, 1);
                             Clock.synced = true;
+                            Clock.finishedLoadingStep();
                             return;
                         }
                     }
@@ -116,6 +125,7 @@ var Clock = {
                         if (! Clock.synced)
                             Clock.loadingProgress('Syncing',1, 1);
                         Clock.synced = true;
+                        Clock.finishedLoadingStep();
 
                         // save the offset for future page loads
                         var days = 7;
@@ -188,6 +198,7 @@ var Clock = {
                     Clock.loadedCount += 1;
                     Clock.loadingProgress('Loaded',Clock.loadedCount, Clock.soundsCount);
                 }
+                Clock.finishedLoadingStep();
             });
             return sound;
         };
@@ -203,6 +214,12 @@ var Clock = {
             Clock.loadingProgress('Loaded',0, Clock.soundsCount);
         } catch (e) {
             // error while loading sound
+        }
+    },
+    "finishedLoadingStep":function () {
+        if (Clock.loadedCount == Clock.soundsCount &&
+            Clock.synced) {
+            Clock.scheduleNextPhrase();
         }
     },
     /** Play a certain sound */
