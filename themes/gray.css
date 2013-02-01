@@ -13,6 +13,13 @@
     top: 0;
     background-image: url('https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png');
 }
+#github a {
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+}
 
 /* Style based on http://www.rainmeterskin.com/rainmeter/2012/0329/209.html */
 body {
