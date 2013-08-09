@@ -502,12 +502,14 @@ var HTMLDigitalView = {
     }
 };
 
-// Based on http://dustindiaz.com/smallest-domready-ever
-function onDomReady(f){document['addEventListener'] ? document.addEventListener('DOMContentLoaded',f) : /in/.test(document.readyState)?setTimeout(function(){onDomReady(f)},9):f()}
+if (typeof(document)!='undefined') {
+    // Based on http://dustindiaz.com/smallest-domready-ever
+    function onDomReady(f){document['addEventListener'] ? document.addEventListener('DOMContentLoaded',f) : /in/.test(document.readyState)?setTimeout(function(){onDomReady(f)},9):f()}
 
-// Hide Javascript warning if Javascript works
-onDomReady(function() {
-    document.getElementById('clock').style.visibility = "visible";
-    document.getElementById('needjs').style.visibility = "hidden";
-    Clock.init();
-});
+    // Hide Javascript warning if Javascript works
+    onDomReady(function() {
+        document.getElementById('clock').style.visibility = "visible";
+        document.getElementById('needjs').style.visibility = "hidden";
+        Clock.init();
+    });
+}
