@@ -367,11 +367,16 @@ var PatFleet = {
             var hoursphrase = [(hours % 12) > 0 ? String(hours % 12) : String(12)];
 
             var minutesphrase = [];
-            if (minutes<10)
-                minutesphrase = ['oh'];
-            minutesphrase = minutesphrase.concat(this.getNumberPhrase(minutes), [hours > 11 ? 'pm': 'am']);
-            if (minutes >= 20 && seconds>0)
-                minutesphrase[minutesphrase.length-3] += '_';
+            if (minutes == 0) {
+                minutesphrase = ['oclock'];
+                minutesphrase.push(hours > 11 ? 'pm':'am');
+            } else {
+                if (minutes<10)
+                    minutesphrase = ['oh'];
+                minutesphrase = minutesphrase.concat(this.getNumberPhrase(minutes), [hours > 11 ? 'pm': 'am']);
+                if (minutes >= 20 && minutes%10>0)
+                    minutesphrase[minutesphrase.length-3] += '_';
+            }
 
             var secondsphrase = [];
             if (seconds != 0)
